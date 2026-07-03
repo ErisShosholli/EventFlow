@@ -1,14 +1,11 @@
 import Link from "next/link";
 import { auth } from "@/server/lib/auth";
-import { prisma } from "@/server/lib/prisma";
+import { listEventsForUser } from "@/server/services/event.service";
 
 export default async function DashboardPage() {
   const session = await auth();
   const events = session?.user?.id
-    ? await prisma.event.findMany({
-        where: { userId: session.user.id },
-        orderBy: { createdAt: "desc" },
-      })
+    ? await listEventsForUser(session.user.id)
     : [];
 
   return (
