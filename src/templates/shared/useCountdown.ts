@@ -7,7 +7,8 @@ export function useCountdown(target: Date) {
   const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
-    setNow(Date.now());
+    // First tick lands within 1s of mount via the interval itself, rather
+    // than an immediate setState here, to avoid cascading renders.
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);

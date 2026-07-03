@@ -1,7 +1,16 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/server/lib/prisma";
+import { Plan } from "@/generated/prisma/enums";
 
 export class EmailInUseError extends Error {}
+
+export async function getUserPlan(userId: string): Promise<Plan> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { plan: true },
+  });
+  return user?.plan ?? Plan.FREE;
+}
 
 export async function createUser(params: {
   name: string;
