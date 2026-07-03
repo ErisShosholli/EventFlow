@@ -1,0 +1,174 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum EventType {
+  WEDDING
+  ENGAGEMENT
+  BIRTHDAY
+  PARTY
+  OTHER
+}
+
+enum PaymentType {
+  PUBLISH
+  TEMPLATE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum RsvpStatus {
+  YES
+  NO
+  MAYBE
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  plan          Plan      @default(FREE)
+
+  accounts Account[]
+  sessions Session[]
+  events   Event[]
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id                 String      @id @default(cuid())
+  userId             String
+  slug               String      @unique
+  type               EventType
+  title              String
+  description        String?
+  eventDate          DateTime
+  location           String?
+  whatsappNumber     String?
+  templateId         String
+  hasPremiumTemplate Boolean     @default(false)
+  status             EventStatus @default(DRAFT)
+  publishedAt        DateTime?
+
+  user     User      @relation(fields: [userId], references: [id])
+  rsvps    Rsvp[]
+  photos   Photo[]
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Rsvp {
+  id          String     @id @default(cuid())
+  eventId     String
+  name        String
+  status      RsvpStatus
+  guestsCount Int        @default(1)
+
+  event Event @relation(fields: [eventId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([eventId])
+}
+
+model Photo {
+  id       String @id @default(cuid())
+  eventId  String
+  imageUrl String
+
+  event Event @relation(fields: [eventId], references: [id])
+
+  uploadedAt DateTime @default(now())
+
+  @@index([eventId])
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  userId          String
+  eventId         String
+  type            PaymentType
+  amountCents     Int
+  currency        String        @default("eur")
+  status          PaymentStatus @default(PENDING)
+  stripeSessionId String        @unique
+  stripePaymentId String?
+
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([eventId])
+  @@index([userId])
+}
+
+// --- NextAuth (Auth.js) v5 required models ---
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
