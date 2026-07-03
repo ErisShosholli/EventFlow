@@ -32,6 +32,7 @@ export function ClassicTemplate({ event }: TemplateProps) {
             Will you join us?
           </h2>
           <RsvpSection
+            eventId={event.id}
             eventTitle={event.title}
             whatsappNumber={event.whatsappNumber}
             buttonClassName="rounded-full border border-stone-400 px-4 py-2 text-sm hover:bg-stone-800 hover:text-amber-50 transition-colors"

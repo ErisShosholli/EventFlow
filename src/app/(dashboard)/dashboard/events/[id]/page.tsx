@@ -93,7 +93,14 @@ export default async function EventDetailPage({
       {isPublished && (
         <p className="mt-4 text-sm">
           Invitation link:{" "}
-          <span className="font-mono">/invite/{event.slug}</span>
+          <a
+            href={`/invite/${event.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono underline"
+          >
+            /invite/{event.slug}
+          </a>
         </p>
       )}
 
@@ -116,6 +123,39 @@ export default async function EventDetailPage({
         <p className="mt-2 text-sm text-gray-500">
           {guestsAttending} guest{guestsAttending === 1 ? "" : "s"} attending
         </p>
+
+        {event.rsvps.length === 0 ? (
+          <p className="mt-4 text-sm text-gray-500">
+            No responses yet. Guests can RSVP once the event is published.
+          </p>
+        ) : (
+          <div className="mt-4 overflow-hidden rounded-md border border-gray-200">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-left text-gray-500">
+                <tr>
+                  <th className="px-4 py-2 font-medium">Name</th>
+                  <th className="px-4 py-2 font-medium">Response</th>
+                  <th className="px-4 py-2 font-medium">Guests</th>
+                  <th className="px-4 py-2 font-medium">Received</th>
+                </tr>
+              </thead>
+              <tbody>
+                {event.rsvps.map((rsvp) => (
+                  <tr key={rsvp.id} className="border-t border-gray-100">
+                    <td className="px-4 py-2">{rsvp.name}</td>
+                    <td className="px-4 py-2">{rsvp.status}</td>
+                    <td className="px-4 py-2">
+                      {rsvp.status === RsvpStatus.NO ? "—" : rsvp.guestsCount}
+                    </td>
+                    <td className="px-4 py-2 text-gray-500">
+                      {rsvp.createdAt.toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <section className="mt-10">

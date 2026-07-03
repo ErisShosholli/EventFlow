@@ -39,6 +39,7 @@ export function GoldFoilTemplate({ event }: TemplateProps) {
             Will you join us?
           </h2>
           <RsvpSection
+            eventId={event.id}
             eventTitle={event.title}
             whatsappNumber={event.whatsappNumber}
             buttonClassName="rounded-none border border-amber-500/60 px-4 py-2 text-xs uppercase tracking-widest text-amber-300 hover:border-amber-400 transition-colors"

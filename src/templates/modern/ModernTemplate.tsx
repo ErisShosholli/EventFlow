@@ -36,6 +36,7 @@ export function ModernTemplate({ event }: TemplateProps) {
             RSVP
           </h2>
           <RsvpSection
+            eventId={event.id}
             eventTitle={event.title}
             whatsappNumber={event.whatsappNumber}
             buttonClassName="rounded-none border border-neutral-600 px-4 py-2 text-xs uppercase tracking-wider hover:border-white transition-colors"

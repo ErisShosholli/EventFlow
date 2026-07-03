@@ -11,6 +11,7 @@ export interface EventPhoto {
  * templates render whatever the host typed.
  */
 export interface EventData {
+  id: string;
   slug: string;
   title: string;
   type: EventType;

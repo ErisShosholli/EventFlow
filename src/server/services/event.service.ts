@@ -1,5 +1,6 @@
 import { prisma } from "@/server/lib/prisma";
 import { isValidTemplateId } from "@/templates/registry";
+import { EventStatus } from "@/generated/prisma/enums";
 import type { CreateEventInput } from "@/lib/schemas/event";
 
 export class InvalidTemplateError extends Error {}
@@ -68,8 +69,19 @@ export async function getEventForUser(eventId: string, userId: string) {
   return prisma.event.findFirst({
     where: { id: eventId, userId },
     include: {
-      rsvps: true,
+      rsvps: { orderBy: { createdAt: "desc" } },
       photos: true,
+    },
+  });
+}
+
+// CLAUDE.md §3.1: the public guest link 404s until the event is paid and
+// published — filtering on status here is what enforces that.
+export async function getPublishedEventBySlug(slug: string) {
+  return prisma.event.findFirst({
+    where: { slug, status: EventStatus.PUBLISHED },
+    include: {
+      photos: { orderBy: { uploadedAt: "desc" } },
     },
   });
 }

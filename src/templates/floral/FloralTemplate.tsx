@@ -42,6 +42,7 @@ export function FloralTemplate({ event }: TemplateProps) {
             Will you join us?
           </h2>
           <RsvpSection
+            eventId={event.id}
             eventTitle={event.title}
             whatsappNumber={event.whatsappNumber}
             buttonClassName="rounded-full border border-rose-300 bg-white/70 px-4 py-2 text-sm text-rose-700 hover:bg-rose-100 transition-colors"
