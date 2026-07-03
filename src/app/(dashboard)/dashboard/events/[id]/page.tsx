@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { auth } from "@/server/lib/auth";
 import { getEventForUser } from "@/server/services/event.service";
 import { getTemplate } from "@/templates/registry";
@@ -41,13 +42,21 @@ export default async function EventDetailPage({
             {event.hasPremiumTemplate ? " (premium unlocked)" : ""}
           </p>
         </div>
-        <button
-          disabled
-          title="Publishing (Stripe checkout) ships in a later step"
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
-        >
-          Publish
-        </button>
+        <div className="flex gap-2">
+          <Link
+            href={`/dashboard/events/${event.id}/preview`}
+            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium"
+          >
+            Preview
+          </Link>
+          <button
+            disabled
+            title="Publishing (Stripe checkout) ships in a later step"
+            className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
+          >
+            Publish
+          </button>
+        </div>
       </div>
 
       {event.status === "PUBLISHED" && (
