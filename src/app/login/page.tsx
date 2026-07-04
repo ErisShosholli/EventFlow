@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { Suspense } from "react";
+import Brand from "@/components/Brand";
 
 function LoginForm() {
   const router = useRouter();
@@ -39,42 +40,58 @@ function LoginForm() {
 
   return (
     <div className="w-full max-w-sm">
-      <h1 className="mb-6 text-center text-2xl font-semibold text-gray-900">Welcome back</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-white p-6 shadow-sm">
+      <div className="mb-8 flex justify-center">
+        <Brand />
+      </div>
+      <h1 className="mb-6 text-center font-display text-3xl font-semibold text-foreground">
+        Welcome back
+      </h1>
+      <form onSubmit={handleSubmit} className="card space-y-4 p-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Email</label>
+          <label htmlFor="email" className="label">
+            Email
+          </label>
           <input
+            id="email"
             type="email"
             required
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400"
+            className="input"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Password</label>
+          <label htmlFor="password" className="label">
+            Password
+          </label>
           <input
+            id="password"
             type="password"
             required
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400"
+            className="input"
           />
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded-lg bg-rose-500 px-4 py-2.5 font-medium text-white transition hover:bg-rose-600 disabled:opacity-60"
-        >
+        <button type="submit" disabled={submitting} className="btn-primary w-full">
           {submitting ? "Logging in…" : "Log in"}
         </button>
       </form>
-      <p className="mt-4 text-center text-sm text-gray-500">
+      <p className="mt-5 text-center text-sm text-stone-500">
         Don&apos;t have an account?{" "}
-        <Link href="/signup" className="font-medium text-rose-600 hover:underline">
+        <Link
+          href="/signup"
+          className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
           Sign up
         </Link>
       </p>
@@ -84,7 +101,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-rose-50 to-white px-4">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-10">
       <Suspense>
         <LoginForm />
       </Suspense>

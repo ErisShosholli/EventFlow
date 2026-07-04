@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IconCheck, IconLink } from "@/components/icons";
 
 export default function CopyLinkButton({ url }: { url: string }) {
   const [copied, setCopied] = useState(false);
@@ -15,9 +16,20 @@ export default function CopyLinkButton({ url }: { url: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-400"
+      className="btn-outline px-4 py-2 text-sm"
+      aria-live="polite"
     >
-      {copied ? "Copied!" : "Copy link"}
+      {copied ? (
+        <>
+          <IconCheck className="h-4 w-4 text-emerald-600" />
+          Copied!
+        </>
+      ) : (
+        <>
+          <IconLink className="h-4 w-4" />
+          Copy link
+        </>
+      )}
     </button>
   );
 }

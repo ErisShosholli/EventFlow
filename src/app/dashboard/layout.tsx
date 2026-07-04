@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { auth } from "@/lib/auth";
+import Brand from "@/components/Brand";
 import LogoutButton from "@/components/LogoutButton";
 
 export default async function DashboardLayout({
@@ -10,14 +10,14 @@ export default async function DashboardLayout({
   const session = await auth();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white">
+    <div className="min-h-dvh bg-background">
+      <header className="border-b border-border-soft bg-surface/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/dashboard" className="text-lg font-semibold text-gray-900">
-            💍 EventFlow
-          </Link>
+          <Brand href="/dashboard" />
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-500">{session?.user?.email}</span>
+            <span className="hidden text-sm text-stone-500 sm:inline">
+              {session?.user?.email}
+            </span>
             <LogoutButton />
           </div>
         </div>

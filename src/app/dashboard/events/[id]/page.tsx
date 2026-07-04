@@ -3,6 +3,20 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import QrCodeCard from "@/components/QrCodeCard";
 import UpgradeButton from "@/components/UpgradeButton";
+import {
+  IconCalendar,
+  IconMapPin,
+  IconUsers,
+  IconCheck,
+  IconQuestion,
+  IconX,
+} from "@/components/icons";
+
+const STATUS_BADGES = {
+  yes: { label: "Yes", icon: IconCheck, classes: "bg-emerald-50 text-emerald-700" },
+  maybe: { label: "Maybe", icon: IconQuestion, classes: "bg-amber-50 text-amber-700" },
+  no: { label: "No", icon: IconX, classes: "bg-rose-50 text-rose-700" },
+} as const;
 
 export default async function EventDetailPage({
   params,
@@ -31,92 +45,121 @@ export default async function EventDetailPage({
   const inviteUrl = `${origin}/invite/${event.slug}`;
   const photoWallUrl = `${origin}/event/${event.slug}/photos`;
 
+  const stats = [
+    { label: "Total responses", value: event.rsvps.length, valueClass: "text-foreground" },
+    { label: "Yes", value: yes.length, valueClass: "text-emerald-600" },
+    { label: "Maybe", value: maybe.length, valueClass: "text-amber-600" },
+    { label: "No", value: no.length, valueClass: "text-rose-600" },
+  ];
+
   return (
     <div>
-      <div className="flex items-start justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">{event.title}</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="font-display text-3xl font-semibold text-foreground">
+            {event.title}
+          </h1>
+          <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-stone-500">
+            <IconCalendar className="h-4 w-4 text-secondary" />
             {new Intl.DateTimeFormat("en", { dateStyle: "full", timeStyle: "short" }).format(
               event.date
             )}
           </p>
+          {event.location && (
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-stone-500">
+              <IconMapPin className="h-4 w-4 text-secondary" />
+              {event.location}
+            </p>
+          )}
         </div>
         {!event.isPremium && <UpgradeButton eventId={event.id} />}
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <div className="rounded-xl bg-white p-5 text-center shadow-sm">
-          <p className="text-2xl font-semibold text-gray-900">{event.rsvps.length}</p>
-          <p className="text-sm text-gray-500">Total responses</p>
-        </div>
-        <div className="rounded-xl bg-white p-5 text-center shadow-sm">
-          <p className="text-2xl font-semibold text-emerald-600">{yes.length}</p>
-          <p className="text-sm text-gray-500">Yes</p>
-        </div>
-        <div className="rounded-xl bg-white p-5 text-center shadow-sm">
-          <p className="text-2xl font-semibold text-amber-600">{maybe.length}</p>
-          <p className="text-sm text-gray-500">Maybe</p>
-        </div>
-        <div className="rounded-xl bg-white p-5 text-center shadow-sm">
-          <p className="text-2xl font-semibold text-red-500">{no.length}</p>
-          <p className="text-sm text-gray-500">No</p>
-        </div>
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {stats.map((stat) => (
+          <div key={stat.label} className="card p-5 text-center">
+            <p className={`text-3xl font-semibold tabular-nums ${stat.valueClass}`}>
+              {stat.value}
+            </p>
+            <p className="mt-1 text-sm text-stone-500">{stat.label}</p>
+          </div>
+        ))}
       </div>
 
-      <p className="mt-2 text-sm text-gray-500">Total guests attending: {totalGuests}</p>
+      <p className="mt-3 inline-flex items-center gap-1.5 text-sm text-stone-500">
+        <IconUsers className="h-4 w-4 text-secondary" />
+        Total guests attending: <span className="font-semibold text-foreground">{totalGuests}</span>
+      </p>
 
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
         <QrCodeCard url={inviteUrl} label="Invitation link" />
         <QrCodeCard url={photoWallUrl} label="Photo wall (print for the event!)" />
       </div>
 
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900">Guest list</h2>
+      <section aria-labelledby="guest-list" className="mt-10">
+        <h2 id="guest-list" className="font-display text-2xl font-semibold text-foreground">
+          Guest list
+        </h2>
         {event.rsvps.length === 0 ? (
-          <p className="mt-2 text-sm text-gray-500">No responses yet.</p>
+          <p className="mt-2 text-sm text-stone-500">No responses yet.</p>
         ) : (
-          <div className="mt-3 overflow-hidden rounded-xl bg-white shadow-sm">
+          <div className="card mt-4 overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 text-gray-500">
+              <thead className="border-b border-border-soft text-stone-500">
                 <tr>
-                  <th className="px-4 py-2 font-medium">Name</th>
-                  <th className="px-4 py-2 font-medium">Status</th>
-                  <th className="px-4 py-2 font-medium">Guests</th>
+                  <th className="px-5 py-3 font-medium">Name</th>
+                  <th className="px-5 py-3 font-medium">Status</th>
+                  <th className="px-5 py-3 font-medium">Guests</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
-                {event.rsvps.map((rsvp) => (
-                  <tr key={rsvp.id}>
-                    <td className="px-4 py-2 text-gray-900">{rsvp.name}</td>
-                    <td className="px-4 py-2 capitalize text-gray-600">{rsvp.status}</td>
-                    <td className="px-4 py-2 text-gray-600">{rsvp.guestsCount}</td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-border-soft">
+                {event.rsvps.map((rsvp) => {
+                  const badge = STATUS_BADGES[rsvp.status];
+                  const BadgeIcon = badge.icon;
+                  return (
+                    <tr key={rsvp.id}>
+                      <td className="px-5 py-3 font-medium text-stone-800">{rsvp.name}</td>
+                      <td className="px-5 py-3">
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${badge.classes}`}
+                        >
+                          <BadgeIcon className="h-3.5 w-3.5" />
+                          {badge.label}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 tabular-nums text-stone-600">
+                        {rsvp.guestsCount}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
-      </div>
+      </section>
 
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900">Recent photos</h2>
+      <section aria-labelledby="recent-photos" className="mt-10">
+        <h2 id="recent-photos" className="font-display text-2xl font-semibold text-foreground">
+          Recent photos
+        </h2>
         {event.photos.length === 0 ? (
-          <p className="mt-2 text-sm text-gray-500">No photos uploaded yet.</p>
+          <p className="mt-2 text-sm text-stone-500">No photos uploaded yet.</p>
         ) : (
-          <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
+          <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
             {event.photos.map((photo) => (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={photo.id}
                 src={photo.imageUrl}
                 alt="Guest upload"
-                className="aspect-square w-full rounded-lg object-cover shadow-sm"
+                loading="lazy"
+                className="aspect-square w-full rounded-xl object-cover shadow-soft"
               />
             ))}
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }

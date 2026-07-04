@@ -47,81 +47,90 @@ export default function EventForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 rounded-xl bg-white p-6 shadow-sm">
+    <form onSubmit={handleSubmit} className="card space-y-5 p-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700">Event title</label>
+        <label htmlFor="event-title" className="label">
+          Event title <span aria-hidden className="text-primary">*</span>
+        </label>
         <input
+          id="event-title"
           type="text"
           required
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Sara & Alex's Wedding"
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400"
+          className="input"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Message / description</label>
+        <label htmlFor="event-description" className="label">
+          Message / description
+        </label>
         <textarea
+          id="event-description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
           placeholder="Join us as we celebrate..."
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400"
+          className="input min-h-24"
         />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Date & time</label>
+          <label htmlFor="event-date" className="label">
+            Date &amp; time <span aria-hidden className="text-primary">*</span>
+          </label>
           <input
+            id="event-date"
             type="datetime-local"
             required
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400"
+            className="input"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Location</label>
+          <label htmlFor="event-location" className="label">
+            Location
+          </label>
           <input
+            id="event-location"
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Grand Hall, Lisbon"
-            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400"
+            className="input"
           />
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Theme</label>
-        <div className="mt-2 grid grid-cols-4 gap-2">
+      <fieldset>
+        <legend className="label">Theme</legend>
+        <div className="mt-1 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {THEMES.map((t) => (
             <button
               key={t.value}
               type="button"
               onClick={() => setTheme(t.value)}
-              className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
-                theme === t.value
-                  ? "border-rose-400 bg-rose-50 text-rose-700"
-                  : "border-gray-300 text-gray-600 hover:border-gray-400"
-              }`}
+              aria-pressed={theme === t.value}
+              className={`chip ${theme === t.value ? "chip-selected" : "chip-unselected"}`}
             >
               {t.label}
             </button>
           ))}
         </div>
-      </div>
+      </fieldset>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      )}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="w-full rounded-lg bg-rose-500 px-4 py-2.5 font-medium text-white transition hover:bg-rose-600 disabled:opacity-60"
-      >
+      <button type="submit" disabled={submitting} className="btn-primary w-full">
         {submitting ? "Creating…" : "Create event"}
       </button>
     </form>

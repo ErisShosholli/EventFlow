@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { IconPhoto } from "@/components/icons";
 
 type Photo = {
   id: string;
@@ -31,11 +32,32 @@ export default function PhotoGallery({ slug, refreshKey }: { slug: string; refre
   }, [load]);
 
   if (loading) {
-    return <p className="text-center text-sm text-gray-500">Loading photos…</p>;
+    return (
+      <div
+        aria-label="Loading photos"
+        className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4"
+      >
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div
+            key={i}
+            className="aspect-square w-full animate-pulse rounded-xl bg-border-soft"
+          />
+        ))}
+      </div>
+    );
   }
 
   if (photos.length === 0) {
-    return <p className="text-center text-sm text-gray-500">No photos yet — be the first to share one!</p>;
+    return (
+      <div className="card p-10 text-center">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-background text-secondary">
+          <IconPhoto className="h-6 w-6" />
+        </span>
+        <p className="mt-3 text-sm text-stone-500">
+          No photos yet — be the first to share one!
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -46,7 +68,7 @@ export default function PhotoGallery({ slug, refreshKey }: { slug: string; refre
           key={photo.id}
           src={photo.imageUrl}
           alt="Event guest upload"
-          className="aspect-square w-full rounded-lg object-cover shadow-sm"
+          className="aspect-square w-full rounded-xl object-cover shadow-soft"
           loading="lazy"
         />
       ))}

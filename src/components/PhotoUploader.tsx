@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { IconCamera } from "@/components/icons";
 
 function fileToDataUri(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -51,12 +52,11 @@ export default function PhotoUploader({
   }
 
   return (
-    <div className="rounded-xl border-2 border-dashed border-rose-200 bg-rose-50/50 p-6 text-center">
+    <div className="rounded-2xl border-2 border-dashed border-border bg-surface/60 p-6 text-center">
       <input
         ref={inputRef}
         type="file"
         accept="image/*"
-        capture="environment"
         multiple
         className="hidden"
         onChange={(e) => handleFiles(e.target.files)}
@@ -65,12 +65,19 @@ export default function PhotoUploader({
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={uploading}
-        className="rounded-lg bg-rose-500 px-5 py-2.5 font-medium text-white transition hover:bg-rose-600 disabled:opacity-60"
+        className="btn-primary px-6"
       >
+        <IconCamera className="h-5 w-5" />
         {uploading ? "Uploading…" : "Add a photo"}
       </button>
-      <p className="mt-2 text-sm text-gray-500">Snap a photo or choose from your gallery</p>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      <p className="mt-2.5 text-sm text-stone-500">
+        Snap a photo or choose from your gallery
+      </p>
+      {error && (
+        <p role="alert" className="mt-2 text-sm text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

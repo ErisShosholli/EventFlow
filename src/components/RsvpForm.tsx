@@ -1,6 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { IconCheck, IconQuestion, IconX } from "@/components/icons";
+
+const STATUS_OPTIONS = [
+  { value: "yes", label: "Yes", icon: IconCheck },
+  { value: "maybe", label: "Maybe", icon: IconQuestion },
+  { value: "no", label: "No", icon: IconX },
+] as const;
 
 export default function RsvpForm({ slug }: { slug: string }) {
   const [name, setName] = useState("");
@@ -37,68 +44,82 @@ export default function RsvpForm({ slug }: { slug: string }) {
 
   if (submitted) {
     return (
-      <div className="rounded-xl bg-emerald-50 p-6 text-center text-emerald-800">
-        <p className="text-lg font-medium">Thank you, {name}!</p>
+      <div
+        role="status"
+        className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6 text-center text-emerald-800"
+      >
+        <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100">
+          <IconCheck className="h-5 w-5 text-emerald-700" />
+        </span>
+        <p className="mt-3 font-display text-xl font-semibold">Thank you, {name}!</p>
         <p className="mt-1 text-sm">Your RSVP has been recorded.</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-xl bg-white p-6 shadow-sm">
+    <form onSubmit={handleSubmit} className="card space-y-4 p-6 text-left">
       <div>
-        <label className="block text-sm font-medium text-gray-700">Your name</label>
+        <label htmlFor="rsvp-name" className="label">
+          Your name <span aria-hidden className="text-primary">*</span>
+        </label>
         <input
+          id="rsvp-name"
           type="text"
           required
+          autoComplete="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400"
+          className="input"
           placeholder="Jane Doe"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Will you attend?</label>
-        <div className="mt-2 grid grid-cols-3 gap-2">
-          {(["yes", "maybe", "no"] as const).map((option) => (
+      <fieldset>
+        <legend className="label">Will you attend?</legend>
+        <div className="mt-1 grid grid-cols-3 gap-2">
+          {STATUS_OPTIONS.map((option) => (
             <button
-              key={option}
+              key={option.value}
               type="button"
-              onClick={() => setStatus(option)}
-              className={`rounded-lg border px-3 py-2 text-sm font-medium capitalize transition ${
-                status === option
-                  ? "border-rose-400 bg-rose-50 text-rose-700"
-                  : "border-gray-300 text-gray-600 hover:border-gray-400"
+              onClick={() => setStatus(option.value)}
+              aria-pressed={status === option.value}
+              className={`chip ${
+                status === option.value ? "chip-selected" : "chip-unselected"
               }`}
             >
-              {option}
+              <option.icon className="mr-1.5 h-4 w-4" />
+              {option.label}
             </button>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       {status !== "no" && (
         <div>
-          <label className="block text-sm font-medium text-gray-700">Number of guests</label>
+          <label htmlFor="rsvp-guests" className="label">
+            Number of guests
+          </label>
           <input
+            id="rsvp-guests"
             type="number"
             min={1}
             max={20}
             value={guestsCount}
             onChange={(e) => setGuestsCount(Number(e.target.value))}
-            className="mt-1 w-24 rounded-lg border border-gray-300 px-3 py-2 focus:border-rose-400 focus:outline-none focus:ring-1 focus:ring-rose-400"
+            className="input w-28 tabular-nums"
           />
+          <p className="mt-1.5 text-xs text-stone-500">Including yourself.</p>
         </div>
       )}
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      )}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="w-full rounded-lg bg-rose-500 px-4 py-2.5 font-medium text-white transition hover:bg-rose-600 disabled:opacity-60"
-      >
+      <button type="submit" disabled={submitting} className="btn-primary w-full">
         {submitting ? "Submitting…" : "Send RSVP"}
       </button>
     </form>

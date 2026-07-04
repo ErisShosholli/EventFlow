@@ -25,7 +25,9 @@ export default function CountdownTimer({ date }: { date: string }) {
   }, [date]);
 
   if (!timeLeft) {
-    return <p className="text-lg font-medium text-rose-600">The big day is here!</p>;
+    return (
+      <p className="font-script text-2xl text-primary">The big day is here!</p>
+    );
   }
 
   const units = [
@@ -36,13 +38,15 @@ export default function CountdownTimer({ date }: { date: string }) {
   ];
 
   return (
-    <div className="flex justify-center gap-4">
+    <div className="flex justify-center gap-3 sm:gap-4">
       {units.map((unit) => (
         <div key={unit.label} className="text-center">
-          <div className="w-14 rounded-lg bg-white/80 py-2 text-2xl font-semibold text-rose-600 shadow-sm">
+          <div className="w-14 rounded-xl border border-border-soft bg-surface py-2.5 font-display text-2xl font-semibold tabular-nums text-primary shadow-soft sm:w-16">
             {unit.value}
           </div>
-          <div className="mt-1 text-xs uppercase tracking-wide text-gray-500">{unit.label}</div>
+          <div className="mt-1.5 text-xs tracking-wide text-stone-500 uppercase">
+            {unit.label}
+          </div>
         </div>
       ))}
     </div>
