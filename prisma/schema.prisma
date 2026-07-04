@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Plan {
+  free
+  pro
+}
+
+enum RsvpStatus {
+  yes
+  no
+  maybe
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  failed
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String?
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  plan          Plan      @default(free)
+  createdAt     DateTime  @default(now())
+
+  accounts Account[]
+  sessions Session[]
+  events   Event[]
+  payments Payment[]
+}
+
+// NextAuth (Auth.js) Prisma adapter models
+model Account {
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? @db.Text
+  access_token             String? @db.Text
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? @db.Text
+  session_state            String?
+  refresh_token_expires_in Int?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  userId      String
+  slug        String   @unique
+  title       String
+  description String?  @db.Text
+  date        DateTime
+  location    String?
+  theme       String   @default("classic")
+  isPremium   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rsvps Rsvp[]
+  photos Photo[]
+  payments Payment[]
+
+  @@index([userId])
+}
+
+model Rsvp {
+  id          String     @id @default(cuid())
+  eventId     String
+  name        String
+  status      RsvpStatus
+  guestsCount Int        @default(1)
+  createdAt   DateTime   @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+model Photo {
+  id         String   @id @default(cuid())
+  eventId    String
+  imageUrl   String
+  uploadedAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  userId    String
+  eventId   String?
+  amount    Int
+  status    PaymentStatus @default(pending)
+  createdAt DateTime      @default(now())
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event? @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
